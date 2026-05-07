@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Laporan - {{ app_name }}{% endblock %}
+{% block page_title %}Laporan Absensi{% endblock %}
+
+{% block content %}
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="GET" class="row g-2 align-items-center">
+      <div class="col-auto">
+        <label class="form-label mb-0 fw-semibold">Bulan:</label>
+      </div>
+      <div class="col-auto">
+        <input type="month" name="month" value="{{ month }}" class="form-control">
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-1"></i>Filter</button>
+      </div>
+      <div class="col-auto">
+        <a href="{{ url_for('export_report', month=month) }}" class="btn btn-success">
+          <i class="fas fa-file-excel me-1"></i>Export Excel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card">
+      <div class="card-header bg-success text-white">
+        <i class="fas fa-chart-pie me-2"></i>Rekap Per Pengguna - {{ month }}
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 small">
+            <thead>
+              <tr><th>Nama</th><th>NIM</th><th>Hadir</th><th>Total</th><th>%</th></tr>
+            </thead>
+            <tbody>
+              {% for s in summary %}
+              <tr>
+                <td class="fw-semibold">{{ s.name }}</td>
+                <td><code>{{ s.nim }}</code></td>
+                <td>{{ s.hadir }}</td>
+                <td>{{ s.total }}</td>
+                <td>
+                  {% set pct = (s.hadir / s.total * 100)|int if s.total > 0 else 0 %}
+                  <span class="badge bg-{{ 'success' if pct>=75 else 'warning text-dark' if pct>=50 else 'danger' }}">
+                    {{ pct }}%
+                  </span>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="5" class="text-center text-muted py-4">Tidak ada data</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <i class="fas fa-list me-2"></i>Detail Absensi - {{ month }}
+      </div>
+      <div class="card-body p-0" style="max-height:500px;overflow-y:auto">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 small">
+            <thead>
+              <tr><th>Tanggal</th><th>Nama</th><th>Waktu</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              {% for r in records %}
+              <tr>
+                <td>{{ r.date }}</td>
+                <td>{{ r.name }}</td>
+                <td>{{ r.time }}</td>
+                <td>
+                  <span class="badge bg-{{ 'success' if r.status=='hadir' else 'warning text-dark' if r.status=='terlambat' else 'danger' }}">
+                    {{ r.status }}
+                  </span>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" class="text-center text-muted py-4">Tidak ada data</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
