@@ -1,0 +1,7 @@
+flask
+opencv-contrib-python-headless
+numpy
+pillow
+requests
+pandas
+openpyxl
